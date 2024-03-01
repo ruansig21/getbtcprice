@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Bitcoin</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f4f4f4;
+        margin-bottom: 50px; /* Adicionado margem inferior para acomodar o link no final da página */
+    }
+    h1, h2 {
+        color: #333;
+        font-size: 28px; /* Aumentando ainda mais o tamanho da fonte */
+    }
+    #btcPrice {
+        font-size: 28px; /* Aumentando ainda mais o tamanho da fonte */
+        margin-top: 20px;
+    }
+    input[type="number"] {
+        width: 200px; /* Aumentando a largura dos campos de entrada */
+        margin: 20px; /* Aumentando a margem */
+        padding: 12px; /* Aumentando o preenchimento */
+        border: 2px solid #ffa500; /* Alterando a cor da borda para laranja */
+        border-radius: 30px; /* Arredondando ainda mais as bordas */
+        font-size: 24px; /* Aumentando ainda mais o tamanho da fonte */
+    }
+    input[type="number"]:focus {
+        outline: none;
+        border-color: #ffa500;
+    }
+    #resultado {
+        margin-top: 20px; /* Aumentando a margem superior */
+        font-weight: bold;
+        color: #ffa500;
+        font-size: 24px; /* Aumentando ainda mais o tamanho da fonte */
+    }
+    #perfil-link {
+        font-size: 24px; /* Aumentando ainda mais o tamanho da fonte */
+        margin-top: 30px;
+    }
+</style>
+</head>
+<body>
+    <h1>Cotação Atual do Bitcoin</h1>
+    <div id="btcPrice">Carregando...</div>
+
+    <h2>Calculadora Bitcoin</h2>
+    <label for="reais">Reais:</label>
+    <input type="number" id="reais" oninput="calcularBitcoin()">
+    <br>
+    <label for="bitcoins">Bitcoins:</label>
+    <input type="number" id="bitcoins" oninput="calcularReais()">
+    <br>
+    <div id="resultado"></div>
+
+    <div id="perfil-link">
+        <a href="https://t.me/OceanicGRD" target="_blank">Meu perfil no Telegram</a>
+    </div>
+
+    <script>
+        // Função para obter e atualizar a cotação do Bitcoin
+        function atualizarCotacaoBitcoin() {
+            // Endpoint da API CoinGecko para obter a cotação do Bitcoin em USD
+            const apiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd';
+
+            // Faz uma requisição GET para a API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    // Obtém o preço atual do Bitcoin em USD
+                    const btcPrice = data.bitcoin.usd;
+
+                    // Atualiza o conteúdo do elemento HTML com o novo preço
+                    document.getElementById('btcPrice').textContent = `Preço do Bitcoin: $${btcPrice}`;
+                })
+                .catch(error => {
+                    console.error('Erro ao obter cotação do Bitcoin:', error);
+                    // Exibe uma mensagem de erro caso ocorra algum problema na requisição
+                    document.getElementById('btcPrice').textContent = 'Erro ao carregar a cotação';
+                });
+        }
+
+        // Atualiza a cotação do Bitcoin quando a página é carregada
+        window.addEventListener('load', atualizarCotacaoBitcoin);
+
+        // Atualiza a cotação do Bitcoin a cada 5 minutos (300000 milissegundos)
+        setInterval(atualizarCotacaoBitcoin, 300000); // 5 minutos em milissegundos
+
+        // Função para calcular o equivalente em bitcoins com base no valor em reais inserido pelo usuário
+        function calcularBitcoin() {
+            const reais = document.getElementById('reais').value;
+            const btcPrice = parseFloat(document.getElementById('btcPrice').textContent.split('$')[1]);
+            const bitcoins = reais / btcPrice;
+            document.getElementById('bitcoins').value = bitcoins.toFixed(8);
+            document.getElementById('resultado').textContent = `Equivalente em Bitcoins: ${bitcoins.toFixed(8)} BTC`;
+        }
+
+        // Função para calcular o equivalente em reais com base no valor em bitcoins inserido pelo usuário
+        function calcularReais() {
+            const bitcoins = document.getElementById('bitcoins').value;
+            const btcPrice = parseFloat(document.getElementById('btcPrice').textContent.split('$')[1]);
+            const reais = bitcoins * btcPrice;
+            document.getElementById('reais').value = reais.toFixed(2);
+            document.getElementById('resultado').textContent = `Equivalente em Reais: R$ ${reais.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
